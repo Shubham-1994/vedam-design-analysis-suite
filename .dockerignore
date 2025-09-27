@@ -1,0 +1,62 @@
+# Ignore local virtual environment (this is the main culprit!)
+venv/
+.venv/
+env/
+.env/
+
+# Ignore node_modules
+node_modules/
+frontend/node_modules/
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+.pytest_cache/
+
+# Ignore local uploads and vector DB
+uploads/
+vector_db/
+
+# Ignore development files
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Ignore documentation and non-essential files
+*.md
+RAILWAY_DEPLOYMENT.md
+README.md
+AGENTS.md
+architecture-diagram.md
+
+# Ignore alternative configs
+requirements-optimized.txt
+Dockerfile.backend
+docker-compose.yml
+vercel.json
+deploy-vercel.sh
+start.sh
+test_*.py
+test_*.png
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/

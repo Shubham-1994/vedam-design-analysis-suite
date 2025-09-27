@@ -1,0 +1,28 @@
+# Railway-specific ignore file
+# This ensures Railway doesn't copy these heavy directories
+
+# Virtual environments (THE MAIN CULPRIT - 2.2GB!)
+venv/
+.venv/
+env/
+.env/
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Local data directories
+uploads/
+vector_db/
+
+# Cache and build artifacts
+__pycache__/
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+
+# Development files
+.git/
+*.log
+.DS_Store
