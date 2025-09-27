@@ -26,8 +26,8 @@ COPY run_backend.py .
 # Create necessary directories
 RUN mkdir -p uploads vector_db
 
-# Expose port
-EXPOSE 8000
+# Expose port (Render will set PORT env var dynamically)
+EXPOSE 8001
 
 # Run the application
 CMD ["python", "run_backend.py"]
