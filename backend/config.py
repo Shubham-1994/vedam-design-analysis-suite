@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     
     # Application Configuration
     host: str = "0.0.0.0"
-    port: int = 8000
-    debug: bool = True
+    port: int = int(os.getenv("PORT", "8000"))  # Use Railway's PORT env var
+    debug: bool = os.getenv("DEBUG", "false").lower() == "true"
     
     @field_validator('max_file_size')
     @classmethod

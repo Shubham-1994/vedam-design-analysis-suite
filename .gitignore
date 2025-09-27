@@ -437,3 +437,4 @@ temp/
 *.njsproj
 *.sln
 *.sw?
+.vercel
