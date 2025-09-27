@@ -1,0 +1,57 @@
+{
+  "batch_id": "aa7fd753-c436-48b8-b003-5c6f7a8eb7f6",
+  "analysis_type": "batch_analysis",
+  "total_files": 1,
+  "context": {
+    "project_name": "Fintech",
+    "target_audience": "25-35",
+    "design_goals": "customer engagement",
+    "industry": "fintech",
+    "platform": "web",
+    "additional_notes": "focus on getting more click ratio"
+  },
+  "batch_metrics": {
+    "average_overall_score": 8.002,
+    "score_range": {
+      "min": 8.002,
+      "max": 8.002
+    },
+    "findings_summary": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    },
+    "total_findings": 1
+  },
+  "file_results": [
+    {
+      "file_index": 0,
+      "filename": "Screenshot 2025-09-27 at 5.29.09\u202fPM.png",
+      "overall_score": 8.002,
+      "key_findings_count": 0,
+      "analysis_id": "aa7fd753-c436-48b8-b003-5c6f7a8eb7f6_file_0"
+    }
+  ],
+  "batch_insights": {
+    "consistency_analysis": {
+      "status": "insufficient_data",
+      "message": "Need at least 2 files for consistency analysis"
+    },
+    "common_issues": [],
+    "best_performing_file": "Screenshot 2025-09-27 at 5.29.09\u202fPM.png",
+    "areas_for_improvement": [
+      "market_analysis"
+    ]
+  },
+  "batch_recommendations": [
+    "Ensure responsive design across all device sizes",
+    "Test with real users for usability validation",
+    "Consider accessibility guidelines (WCAG 2.1)",
+    "Optimize loading performance for better user experience",
+    "Add micro-interactions to enhance user engagement"
+  ],
+  "analysis_timestamp": "2025-09-27T17:30:34.046721",
+  "processing_time": 3.5,
+  "confidence_level": 0.75
+}

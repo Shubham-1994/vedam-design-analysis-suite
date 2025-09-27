@@ -1,0 +1,110 @@
+{
+  "analysis_id": "c7195ba5-57c0-4092-93d9-9898d45125b5",
+  "upload_filename": "Screenshot 2025-09-27 at 5.19.57\u202fPM.png",
+  "context": {
+    "project_name": null,
+    "target_audience": null,
+    "design_goals": null,
+    "industry": null,
+    "platform": null,
+    "additional_notes": null
+  },
+  "agent_results": [
+    {
+      "agent_name": "Visual Analysis Agent (Demo)",
+      "analysis_type": "visual",
+      "findings": [],
+      "overall_score": 7.929,
+      "execution_time": 3.2,
+      "metadata": {
+        "visual_metrics": {
+          "layout_score": 7.929,
+          "visual_hierarchy_score": 7.6290000000000004,
+          "color_harmony_score": 7.8,
+          "typography_score": 7.5,
+          "whitespace_usage_score": 8.1
+        }
+      }
+    },
+    {
+      "agent_name": "UX Critique Agent (Demo)",
+      "analysis_type": "ux_critique",
+      "findings": [],
+      "overall_score": 7.2,
+      "execution_time": 2.8,
+      "metadata": {
+        "ux_metrics": {
+          "usability_score": 7.2,
+          "navigation_clarity": 7.0,
+          "information_architecture": 7.9,
+          "user_flow_efficiency": 8.3
+        }
+      }
+    },
+    {
+      "agent_name": "Market Research Agent (Demo)",
+      "analysis_type": "market_research",
+      "findings": [],
+      "overall_score": 6.5,
+      "execution_time": 4.1,
+      "metadata": {
+        "market_comparison": {
+          "similar_designs": [
+            {
+              "id": "demo_pattern_1",
+              "description": "Modern minimalist interface design",
+              "similarity_score": 0.78,
+              "category": "layout",
+              "usability_score": 8.2
+            },
+            {
+              "id": "demo_pattern_2",
+              "description": "Clean card-based layout system",
+              "similarity_score": 0.65,
+              "category": "visual_hierarchy",
+              "usability_score": 7.9
+            }
+          ],
+          "industry_trends": [
+            "Minimalist design approach",
+            "Mobile-first responsive design",
+            "Accessibility-focused interfaces",
+            "Dark mode compatibility",
+            "Micro-interactions and animations"
+          ],
+          "competitive_analysis": "Design shows good alignment with current market trends. Consider enhancing unique differentiators while maintaining usability standards."
+        }
+      }
+    }
+  ],
+  "overall_score": 7.209666666666667,
+  "visual_metrics": {
+    "layout_score": 7.929,
+    "visual_hierarchy_score": 7.6290000000000004,
+    "color_harmony_score": 7.8,
+    "typography_score": 7.5,
+    "whitespace_usage_score": 8.1
+  },
+  "ux_metrics": {
+    "usability_score": 7.2,
+    "navigation_clarity": 7.0,
+    "information_architecture": 7.9,
+    "user_flow_efficiency": 8.3
+  },
+  "key_strengths": [
+    "Clean and modern visual design",
+    "Good use of whitespace",
+    "Appropriate sizing for target platform"
+  ],
+  "priority_improvements": [],
+  "actionable_recommendations": [
+    "Ensure responsive design across all device sizes",
+    "Test with real users for usability validation",
+    "Consider accessibility guidelines (WCAG 2.1)",
+    "Optimize loading performance for better user experience",
+    "Add micro-interactions to enhance user engagement"
+  ],
+  "analysis_timestamp": "2025-09-27T17:21:08.505885",
+  "processing_time": 10.2,
+  "confidence_level": 0.75
+}
