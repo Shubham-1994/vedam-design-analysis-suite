@@ -29,8 +29,8 @@ class Settings(BaseSettings):
     
     # Application Configuration
     host: str = "0.0.0.0"
-    port: int = int(os.getenv("PORT", "8001"))  # Use PORT env var from deployment platform
-    debug: bool = os.getenv("DEBUG", "false").lower() == "true"
+    port: int = 8000
+    debug: bool = True
     
     @field_validator('max_file_size')
     @classmethod

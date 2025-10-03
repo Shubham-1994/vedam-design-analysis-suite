@@ -245,6 +245,7 @@ public
 
 # Svelte
 .svelte-kit/
+.vite/
 package
 
 # =============================================================================
@@ -427,6 +428,8 @@ dist
 # Temporary folders
 tmp/
 temp/
+vector_db/
+uploads/
 
 # Editor directories and files
 .vscode/*

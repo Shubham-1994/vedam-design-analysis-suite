@@ -14,7 +14,7 @@ class UXCritiqueAgent(BaseAgent):
     """Agent for analyzing UX and usability aspects."""
     
     def __init__(self, api_keys: Optional[Dict[str, str]] = None):
-        super().__init__("UX Critique Agent", AnalysisType.UX_CRITIQUE, api_keys)
+        super().__init__("UX Experience Critic", AnalysisType.UX_CRITIQUE, api_keys)
         
         # UX heuristics and patterns
         self.usability_heuristics = [

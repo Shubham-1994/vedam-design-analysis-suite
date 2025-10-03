@@ -39,8 +39,10 @@ from ..models.schemas import (
     AnalysisResult, AnalysisStatus, DesignContext, AnalysisType, UploadRequest,
     AnalysisHistoryItem, AnalysisHistoryResponse, DownloadFormat
 )
+from pydantic import BaseModel
 from ..agents.orchestrator import get_orchestrator, get_analysis_agent_states, cleanup_analysis_states
 from ..utils.vector_store import get_vector_store
+from ..utils.llm_client import get_llm_client
 
 # Logger already configured above
 
@@ -63,22 +65,21 @@ app.add_middleware(
 # Global state for tracking analyses
 analysis_status: dict = {}
 
-# Global initialization state
-initialization_complete = False
+
+class ChatRequest(BaseModel):
+    message: str
+    analysis_result: Optional[dict] = None
+
+
+class ChatResponse(BaseModel):
+    response: str
 
 # Initialize components on startup
 @app.on_event("startup")
 async def startup_event():
-    """Initialize the application components in background."""
-    # Start initialization in background to not block server startup
-    asyncio.create_task(initialize_components())
-
-
-async def initialize_components():
-    """Initialize application components in background."""
-    global initialization_complete
+    """Initialize the application components."""
     try:
-        logger.info("Starting background initialization...")
+        logger.info("Initializing application components...")
         
         # Initialize vector store and populate with sample data
         vector_store = get_vector_store()
@@ -92,12 +93,11 @@ async def initialize_components():
         # Initialize orchestrator
         orchestrator = get_orchestrator()
         
-        initialization_complete = True
-        logger.info("Background initialization completed successfully")
+        logger.info("Application initialized successfully")
         
     except Exception as e:
-        logger.error(f"Background initialization failed: {e}")
-        # Don't raise here - let the app continue running
+        logger.error(f"Failed to initialize application: {e}")
+        raise
 
 
 @app.get("/")
@@ -106,8 +106,6 @@ async def root():
     return {
         "message": "Multimodal Design Analysis Suite API",
         "version": "1.0.0",
-        "status": "running",
-        "initialization": "completed" if initialization_complete else "in_progress",
         "endpoints": {
             "upload": "/analyze",
             "status": "/analysis/{analysis_id}/status",
@@ -121,38 +119,23 @@ async def root():
 async def health_check():
     """Health check endpoint."""
     try:
-        # Always return healthy for basic server health
-        # This allows Render to detect the port is open
-        response = {
+        # Check vector store
+        vector_store = get_vector_store()
+        stats = vector_store.get_collection_stats()
+        
+        return {
             "status": "healthy",
-            "server": "running",
-            "initialization": "completed" if initialization_complete else "in_progress"
+            "components": {
+                "vector_store": "operational",
+                "total_patterns": stats["total_patterns"]
+            }
         }
-        
-        # Add component details if initialization is complete
-        if initialization_complete:
-            try:
-                vector_store = get_vector_store()
-                stats = vector_store.get_collection_stats()
-                response["components"] = {
-                    "vector_store": "operational",
-                    "total_patterns": stats["total_patterns"]
-                }
-            except Exception as e:
-                logger.warning(f"Component check failed: {e}")
-                response["components"] = {"vector_store": "error"}
-        
-        return response
-        
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        # Still return 200 for basic server health
-        return {
-            "status": "healthy", 
-            "server": "running",
-            "initialization": "error",
-            "error": str(e)
-        }
+        return JSONResponse(
+            status_code=503,
+            content={"status": "unhealthy", "error": str(e)}
+        )
 
 
 @app.post("/analyze", response_model=dict)
@@ -170,13 +153,6 @@ async def analyze_design(
     x_huggingface_key: Optional[str] = Header(None, alias="X-HuggingFace-Key")
 ):
     """Upload and analyze a design file."""
-    
-    # Check if initialization is complete
-    if not initialization_complete:
-        raise HTTPException(
-            status_code=503,
-            detail="Service is still initializing. Please try again in a moment."
-        )
     
     # Validate file type
     if not file.content_type or not file.content_type.startswith('image/'):
@@ -303,9 +279,9 @@ async def get_analysis_status(analysis_id: str):
     elif status.status in ["pending", "processing"]:
         # Initialize with pending states for all agents
         status.agent_states = {
-            "Visual Analysis Agent": "pending",
-            "UX Critique Agent": "pending", 
-            "Market Research Agent": "pending"
+            "Visual Design Analyst": "pending",
+            "UX Experience Critic": "pending", 
+            "Market Research Specialist": "pending"
         }
         logger.info(f"[API STATUS] Using default pending states: {status.agent_states}")
     
@@ -526,6 +502,69 @@ async def download_analysis(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to generate {format.upper()} download"
+        )
+
+
+@app.post("/analysis/{analysis_id}/chat", response_model=ChatResponse)
+async def chat_with_analysis(
+    analysis_id: str,
+    chat_request: ChatRequest,
+    x_openrouter_key: Optional[str] = Header(None, alias="X-OpenRouter-Key")
+):
+    """Chat with AI about analysis results."""
+    
+    try:
+        # Get analysis result if not provided in request
+        analysis_result = chat_request.analysis_result
+        
+        if not analysis_result:
+            # Load result from file
+            result_file = settings.upload_dir / f"{analysis_id}_result.json"
+            
+            if not result_file.exists():
+                raise HTTPException(
+                    status_code=404,
+                    detail="Analysis not found"
+                )
+            
+            with open(result_file, 'r') as f:
+                analysis_result = json.load(f)
+        
+        # Get LLM client
+        llm_client = get_llm_client(x_openrouter_key)
+        
+        if not llm_client.llm:
+            raise HTTPException(
+                status_code=503,
+                detail="LLM service not available. Please check API key configuration."
+            )
+        
+        # Create context from analysis result
+        context = create_analysis_context(analysis_result)
+        
+        # Generate response using LLM
+        response = await generate_chat_response(
+            llm_client,
+            chat_request.message,
+            context,
+            analysis_result
+        )
+        
+        if not response:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate response"
+            )
+        
+        return ChatResponse(response=response)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Chat error for analysis {analysis_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to process chat message"
         )
 
 
@@ -809,6 +848,130 @@ def download_as_csv(result_data: dict, analysis_id: str):
     except Exception as e:
         logger.error(f"Failed to generate CSV: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate CSV")
+
+
+def create_analysis_context(analysis_result: dict) -> str:
+    """Create a structured context from analysis result for chat."""
+    try:
+        context_parts = []
+        
+        # Basic info
+        context_parts.append(f"Analysis ID: {analysis_result.get('analysis_id', 'Unknown')}")
+        context_parts.append(f"File: {analysis_result.get('upload_filename', 'Unknown')}")
+        context_parts.append(f"Overall Score: {analysis_result.get('overall_score', 0):.2f}/10")
+        context_parts.append(f"Processing Time: {analysis_result.get('processing_time', 0):.2f}s")
+        
+        # Key strengths
+        if analysis_result.get('key_strengths'):
+            context_parts.append("\nKey Strengths:")
+            for strength in analysis_result['key_strengths']:
+                context_parts.append(f"- {strength}")
+        
+        # Priority improvements
+        if analysis_result.get('priority_improvements'):
+            context_parts.append("\nPriority Improvements:")
+            for improvement in analysis_result['priority_improvements']:
+                context_parts.append(f"- {improvement.get('title', 'N/A')}: {improvement.get('description', 'N/A')}")
+                context_parts.append(f"  Severity: {improvement.get('severity', 'N/A')}")
+                context_parts.append(f"  Recommendation: {improvement.get('recommendation', 'N/A')}")
+        
+        # Agent results summary
+        if analysis_result.get('agent_results'):
+            context_parts.append("\nAgent Analysis Results:")
+            for agent_result in analysis_result['agent_results']:
+                agent_name = agent_result.get('agent_name', 'Unknown Agent')
+                score = agent_result.get('overall_score', 0)
+                context_parts.append(f"- {agent_name}: {score:.2f}/10")
+                
+                # Top findings
+                findings = agent_result.get('findings', [])
+                if findings:
+                    context_parts.append(f"  Top findings:")
+                    for finding in findings[:3]:  # Limit to top 3 findings
+                        title = finding.get('title', 'N/A')
+                        severity = finding.get('severity', 'N/A')
+                        context_parts.append(f"    • {title} (Severity: {severity})")
+        
+        # Metrics
+        if analysis_result.get('visual_metrics'):
+            context_parts.append("\nVisual Metrics:")
+            for key, value in analysis_result['visual_metrics'].items():
+                if isinstance(value, (int, float)):
+                    context_parts.append(f"- {key}: {value:.2f}")
+        
+        if analysis_result.get('ux_metrics'):
+            context_parts.append("\nUX Metrics:")
+            for key, value in analysis_result['ux_metrics'].items():
+                if isinstance(value, (int, float)):
+                    context_parts.append(f"- {key}: {value:.2f}")
+        
+        # Market comparison
+        if analysis_result.get('market_comparison'):
+            market_comp = analysis_result['market_comparison']
+            if market_comp.get('competitive_analysis'):
+                context_parts.append(f"\nMarket Analysis: {market_comp['competitive_analysis']}")
+            
+            if market_comp.get('industry_trends'):
+                context_parts.append("\nIndustry Trends:")
+                for trend in market_comp['industry_trends'][:3]:  # Limit to 3 trends
+                    context_parts.append(f"- {trend}")
+        
+        return "\n".join(context_parts)
+        
+    except Exception as e:
+        logger.error(f"Failed to create analysis context: {e}")
+        return f"Analysis for {analysis_result.get('upload_filename', 'unknown file')} with overall score {analysis_result.get('overall_score', 0):.2f}/10"
+
+
+async def generate_chat_response(
+    llm_client,
+    user_message: str,
+    analysis_context: str,
+    analysis_result: dict
+) -> Optional[str]:
+    """Generate chat response using LLM with analysis context."""
+    try:
+        from langchain_core.prompts import ChatPromptTemplate
+        
+        # Create a specialized prompt for analysis chat
+        prompt_template = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert UI/UX design analysis assistant. You have access to detailed analysis results for a design and can help users understand:
+
+1. Specific findings and their implications
+2. How to implement recommendations
+3. Design scores and what they mean
+4. Best practices and industry standards
+5. Clarification on technical terms
+
+Guidelines:
+- Be conversational and helpful
+- Provide specific, actionable advice
+- Reference the analysis data when relevant
+- Keep responses concise but informative
+- If asked about something not in the analysis, acknowledge the limitation
+- Use bullet points for lists and recommendations
+- Be encouraging while being honest about areas for improvement
+
+Analysis Context:
+{analysis_context}"""),
+            ("human", "{user_message}")
+        ])
+        
+        response = await llm_client.generate_response(
+            prompt_template,
+            {
+                "analysis_context": analysis_context,
+                "user_message": user_message
+            },
+            temperature=0.7,
+            max_tokens=800
+        )
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Failed to generate chat response: {e}")
+        return None
 
 
 if __name__ == "__main__":

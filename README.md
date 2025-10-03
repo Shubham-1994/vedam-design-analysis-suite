@@ -1,5 +1,7 @@
 # Multimodal Design Analysis Suite
 
+Check out this video: [Pixora](https://app.heygen.com/videos/779f3cf692724aa8a4078f9f51143bdc)
+
 A comprehensive AI-powered UI/UX design analysis platform that uses multimodal agents to provide detailed feedback on visual design, user experience, and market positioning.
 
 ## 🚀 Features

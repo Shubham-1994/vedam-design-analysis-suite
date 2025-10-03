@@ -1,8 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
+  darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: '#eff6ff',

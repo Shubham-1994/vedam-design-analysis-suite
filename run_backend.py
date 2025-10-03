@@ -30,7 +30,6 @@ def main():
         logger.info("Starting Multimodal Design Analysis Suite Backend")
         logger.info(f"Server will run on {settings.host}:{settings.port}")
         logger.info(f"Debug mode: {settings.debug}")
-        logger.info(f"PORT environment variable: {os.getenv('PORT', 'Not set')}")
         
         # Check environment variables
         if not settings.openrouter_api_key:
@@ -40,7 +39,6 @@ def main():
             logger.warning("HUGGINGFACE_API_TOKEN not set - some models may not be accessible")
         
         # Run the server
-        logger.info(f"Binding to {settings.host}:{settings.port}")
         uvicorn.run(
             "backend.api.main:app",
             host=settings.host,

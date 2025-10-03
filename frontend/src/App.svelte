@@ -6,10 +6,18 @@
   import AnalysisDashboard from './lib/components/AnalysisDashboard.svelte';
   import LoadingSpinner from './lib/components/LoadingSpinner.svelte';
   import { analysisStore } from './lib/stores/analysisStore';
+  import { themeStore } from './lib/stores/themeStore';
 
   let currentView: 'upload' | 'loading' | 'results' | 'dashboard' = 'upload';
 
   onMount(() => {
+    // Initialize theme
+    themeStore.subscribe(theme => {
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(theme);
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+
     // Subscribe to analysis store changes
     analysisStore.subscribe((state) => {
       if (state.status === 'idle') {
@@ -44,7 +52,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/20 transition-colors duration-300">
   <Header on:showDashboard={showDashboard} />
   
   <main class="container mx-auto px-4 py-8">
@@ -70,6 +78,6 @@
 
 <style>
   :global(html) {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 </style>

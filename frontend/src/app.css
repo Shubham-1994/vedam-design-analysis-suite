@@ -4,60 +4,182 @@
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
   
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  
+  * {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
   }
 }
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105 active:scale-95;
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 focus:ring-blue-500 shadow-lg hover:shadow-xl;
   }
   
   .btn-secondary {
-    @apply btn bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:ring-primary-500;
+    @apply btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-blue-500;
   }
   
   .btn-danger {
-    @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/20 border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md dark:hover:shadow-gray-900/30;
   }
   
   .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500;
+    @apply block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200;
   }
   
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
   }
   
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide;
   }
   
   .badge-success {
-    @apply badge bg-success-100 text-success-800;
+    @apply badge bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700;
   }
   
   .badge-warning {
-    @apply badge bg-warning-100 text-warning-800;
+    @apply badge bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700;
   }
   
   .badge-danger {
-    @apply badge bg-danger-100 text-danger-800;
+    @apply badge bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700;
   }
   
   .badge-info {
-    @apply badge bg-primary-100 text-primary-800;
+    @apply badge bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700;
+  }
+  
+  /* Designer-focused animations */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.4s ease-out;
+  }
+}
+
+@layer utilities {
+  /* Custom animations for designer UX */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Glass morphism effects for modern design */
+  .glass {
+    @apply backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border border-white/20 dark:border-gray-700/50;
+  }
+  
+  .glass-card {
+    @apply glass rounded-xl shadow-xl dark:shadow-2xl;
+  }
+  
+  /* Prose styling for dark mode */
+  .prose {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+  
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+  
+  .prose strong {
+    @apply text-gray-900 dark:text-gray-100 font-semibold;
+  }
+  
+  .prose em {
+    @apply text-gray-800 dark:text-gray-200;
+  }
+  
+  .prose ul, .prose ol {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+  
+  .prose li {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+  
+  .prose blockquote {
+    @apply text-gray-600 dark:text-gray-400 border-l-gray-300 dark:border-l-gray-600;
+  }
+  
+  .prose code {
+    @apply text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded;
+  }
+  
+  .prose pre {
+    @apply bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100;
+  }
+  
+  .prose a {
+    @apply text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300;
   }
 }

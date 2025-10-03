@@ -16,7 +16,7 @@ class VisualAnalysisAgent(BaseAgent):
     """Agent for analyzing visual design aspects."""
     
     def __init__(self, api_keys: Optional[Dict[str, str]] = None):
-        super().__init__("Visual Analysis Agent", AnalysisType.VISUAL, api_keys)
+        super().__init__("Visual Design Analyst", AnalysisType.VISUAL, api_keys)
         
         # LLM Prompt Templates
         self.visual_analysis_prompt = ChatPromptTemplate.from_messages([

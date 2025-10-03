@@ -13,7 +13,7 @@ class MarketResearchAgent(BaseAgent):
     """Agent for market research and competitive analysis."""
     
     def __init__(self, api_keys: Optional[Dict[str, str]] = None):
-        super().__init__("Market Research Agent", AnalysisType.MARKET_RESEARCH, api_keys)
+        super().__init__("Market Research Specialist", AnalysisType.MARKET_RESEARCH, api_keys)
         
         # Industry trends and patterns
         self.current_trends = [

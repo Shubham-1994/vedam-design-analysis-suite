@@ -152,11 +152,11 @@ class DesignAnalysisOrchestrator:
         agent_states = {}
         for analysis_type in requested_analyses:
             if analysis_type == AnalysisType.VISUAL:
-                agent_states["Visual Analysis Agent"] = "pending"
+                agent_states["Visual Design Analyst"] = "pending"
             elif analysis_type == AnalysisType.UX_CRITIQUE:
-                agent_states["UX Critique Agent"] = "pending"
+                agent_states["UX Experience Critic"] = "pending"
             elif analysis_type == AnalysisType.MARKET_RESEARCH:
-                agent_states["Market Research Agent"] = "pending"
+                agent_states["Market Research Specialist"] = "pending"
         
         # Initialize state
         initial_state = AnalysisState(
@@ -278,7 +278,7 @@ class DesignAnalysisOrchestrator:
         try:
             logger.info(f"Running visual analysis for {state['analysis_id']}")
             state["current_stage"] = "visual_analysis"
-            state["agent_states"]["Visual Analysis Agent"] = "running"
+            state["agent_states"]["Visual Design Analyst"] = "running"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback if available
@@ -293,7 +293,7 @@ class DesignAnalysisOrchestrator:
             
             state["visual_result"] = result
             state["all_findings"].extend(result.findings)
-            state["agent_states"]["Visual Analysis Agent"] = "completed"
+            state["agent_states"]["Visual Design Analyst"] = "completed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for completion
@@ -308,7 +308,7 @@ class DesignAnalysisOrchestrator:
         except Exception as e:
             logger.error(f"Visual analysis failed for {state['analysis_id']}: {e}")
             state["error_message"] = f"Visual analysis failed: {str(e)}"
-            state["agent_states"]["Visual Analysis Agent"] = "failed"
+            state["agent_states"]["Visual Design Analyst"] = "failed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for failure
@@ -325,7 +325,7 @@ class DesignAnalysisOrchestrator:
         try:
             logger.info(f"Running UX analysis for {state['analysis_id']}")
             state["current_stage"] = "ux_analysis"
-            state["agent_states"]["UX Critique Agent"] = "running"
+            state["agent_states"]["UX Experience Critic"] = "running"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback if available
@@ -340,7 +340,7 @@ class DesignAnalysisOrchestrator:
             
             state["ux_result"] = result
             state["all_findings"].extend(result.findings)
-            state["agent_states"]["UX Critique Agent"] = "completed"
+            state["agent_states"]["UX Experience Critic"] = "completed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for completion
@@ -355,7 +355,7 @@ class DesignAnalysisOrchestrator:
         except Exception as e:
             logger.error(f"UX analysis failed for {state['analysis_id']}: {e}")
             state["error_message"] = f"UX analysis failed: {str(e)}"
-            state["agent_states"]["UX Critique Agent"] = "failed"
+            state["agent_states"]["UX Experience Critic"] = "failed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for failure
@@ -372,7 +372,7 @@ class DesignAnalysisOrchestrator:
         try:
             logger.info(f"Running market analysis for {state['analysis_id']}")
             state["current_stage"] = "market_analysis"
-            state["agent_states"]["Market Research Agent"] = "running"
+            state["agent_states"]["Market Research Specialist"] = "running"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback if available
@@ -387,7 +387,7 @@ class DesignAnalysisOrchestrator:
             
             state["market_result"] = result
             state["all_findings"].extend(result.findings)
-            state["agent_states"]["Market Research Agent"] = "completed"
+            state["agent_states"]["Market Research Specialist"] = "completed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for completion
@@ -402,7 +402,7 @@ class DesignAnalysisOrchestrator:
         except Exception as e:
             logger.error(f"Market analysis failed for {state['analysis_id']}: {e}")
             state["error_message"] = f"Market analysis failed: {str(e)}"
-            state["agent_states"]["Market Research Agent"] = "failed"
+            state["agent_states"]["Market Research Specialist"] = "failed"
             update_analysis_agent_states(state["analysis_id"], state["agent_states"])
             
             # Call progress callback for failure
