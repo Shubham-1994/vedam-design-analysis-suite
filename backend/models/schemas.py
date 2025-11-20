@@ -145,3 +145,33 @@ class DownloadFormat(str, Enum):
     PDF = "pdf"
     PNG = "png"
     CSV = "csv"
+
+
+class ImageGenerationRequest(BaseModel):
+    """Request model for image generation."""
+    analysis_id: str
+    generation_options: Optional[Dict[str, Any]] = None
+    num_variants: int = Field(default=1, ge=1, le=5)
+    focus_area: Optional[str] = None
+
+
+class ImageGenerationResult(BaseModel):
+    """Result from image generation."""
+    success: bool
+    generated_image_base64: Optional[str] = None
+    prompt_used: Optional[str] = None
+    generation_options: Optional[Dict[str, Any]] = None
+    improvements_applied: Optional[List[str]] = None
+    variant_name: Optional[str] = None
+    focus_area: Optional[str] = None
+    error: Optional[str] = None
+    message: Optional[str] = None
+
+
+class ImageGenerationResponse(BaseModel):
+    """Response for image generation API."""
+    analysis_id: str
+    original_filename: str
+    variants: List[ImageGenerationResult]
+    generation_timestamp: str
+    processing_time: float

@@ -6,6 +6,7 @@ import asyncio
 import json
 import csv
 import re
+import time
 from pathlib import Path
 from typing import List, Optional
 import logging
@@ -37,7 +38,8 @@ except ImportError:
 from ..config import settings
 from ..models.schemas import (
     AnalysisResult, AnalysisStatus, DesignContext, AnalysisType, UploadRequest,
-    AnalysisHistoryItem, AnalysisHistoryResponse, DownloadFormat
+    AnalysisHistoryItem, AnalysisHistoryResponse, DownloadFormat,
+    ImageGenerationRequest, ImageGenerationResult, ImageGenerationResponse
 )
 from pydantic import BaseModel
 from ..agents.orchestrator import get_orchestrator, get_analysis_agent_states, cleanup_analysis_states
@@ -921,6 +923,100 @@ def create_analysis_context(analysis_result: dict) -> str:
     except Exception as e:
         logger.error(f"Failed to create analysis context: {e}")
         return f"Analysis for {analysis_result.get('upload_filename', 'unknown file')} with overall score {analysis_result.get('overall_score', 0):.2f}/10"
+
+
+@app.post("/analysis/{analysis_id}/regenerate", response_model=ImageGenerationResponse)
+async def regenerate_design(
+    analysis_id: str,
+    generation_request: ImageGenerationRequest,
+    x_openrouter_key: Optional[str] = Header(None, alias="X-OpenRouter-Key")
+):
+    """Generate improved design variants based on analysis results."""
+    
+    try:
+        # Validate analysis exists
+        result_file = settings.upload_dir / f"{analysis_id}_result.json"
+        if not result_file.exists():
+            raise HTTPException(
+                status_code=404,
+                detail="Analysis not found"
+            )
+        
+        # Load analysis results
+        with open(result_file, 'r') as f:
+            analysis_results = json.load(f)
+        
+        # Find original image file
+        image_files = list(settings.upload_dir.glob(f"{analysis_id}_*"))
+        original_image_file = None
+        
+        for img_file in image_files:
+            if img_file.suffix.lower() in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+                original_image_file = img_file
+                break
+        
+        if not original_image_file:
+            raise HTTPException(
+                status_code=404,
+                detail="Original image not found"
+            )
+        
+        # Load original image
+        original_image = Image.open(original_image_file)
+        if original_image.mode != 'RGB':
+            original_image = original_image.convert('RGB')
+        
+        # Import and initialize image generation agent
+        from ..agents.image_generation_agent import ImageGenerationAgent
+        
+        generation_agent = ImageGenerationAgent()
+        
+        start_time = time.time()
+        
+        # Generate variants based on request
+        if generation_request.num_variants > 1:
+            variants_data = await generation_agent.generate_multiple_variants(
+                original_image,
+                analysis_results,
+                generation_request.num_variants
+            )
+        else:
+            # Generate single variant
+            single_result = await generation_agent.generate_improved_design(
+                original_image,
+                analysis_results,
+                generation_request.generation_options
+            )
+            variants_data = [single_result] if single_result else []
+        
+        # Convert to response format
+        variants = []
+        for variant_data in variants_data:
+            variant = ImageGenerationResult(**variant_data)
+            variants.append(variant)
+        
+        processing_time = time.time() - start_time
+        
+        response = ImageGenerationResponse(
+            analysis_id=analysis_id,
+            original_filename=analysis_results.get('upload_filename', 'unknown'),
+            variants=variants,
+            generation_timestamp=datetime.now().isoformat(),
+            processing_time=processing_time
+        )
+        
+        logger.info(f"Generated {len(variants)} design variants for analysis {analysis_id}")
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Image generation failed for analysis {analysis_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate improved design: {str(e)}"
+        )
 
 
 async def generate_chat_response(

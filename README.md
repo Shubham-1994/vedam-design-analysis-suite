@@ -21,6 +21,14 @@ A comprehensive AI-powered UI/UX design analysis platform that uses multimodal a
 - **Enhanced UI**: Modern interface with dropdown menus and improved navigation
 - **Real-time Progress**: Interactive dashboard with real-time analysis tracking
 
+### 🎨 AI Design Regeneration (NEW!)
+- **Qwen-Image-Edit-2509 Integration**: State-of-the-art AI image editing model
+- **Smart Improvement Generation**: Automatically creates improved design variants based on analysis results
+- **Multi-Variant Output**: Generate 1-3 focused improvement variants (Visual Appeal, UX, Professional Polish)
+- **Advanced Controls**: Fine-tune generation with CFG scale, inference steps, and custom prompts
+- **GPU Acceleration**: Optimized for NVIDIA GPUs with CUDA support
+- **Contextual Enhancements**: Industry and platform-specific improvements
+
 ## 🏗️ Architecture
 
 ### Backend (Python)
@@ -81,7 +89,14 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. **Set up environment variables**
+4. **Install AI Design Regeneration (Optional)**
+```bash
+# For the new image regeneration feature
+python install_image_generation.py
+```
+> **Note**: This installs Qwen-Image-Edit-2509 and requires ~10GB disk space. GPU recommended for optimal performance.
+
+5. **Set up environment variables**
 ```bash
 cp env.example .env
 ```
