@@ -261,11 +261,32 @@ async def analyze_design(
 async def get_analysis_status(analysis_id: str):
     """Get the status of an analysis."""
     
+    # Check if result file exists to determine if analysis was completed
+    result_file = settings.upload_dir / f"{analysis_id}_result.json"
+    
     if analysis_id not in analysis_status:
-        raise HTTPException(
-            status_code=404,
-            detail="Analysis not found"
-        )
+        # If not in memory, check if result file exists
+        if result_file.exists():
+            # Analysis was completed but server restarted - create a completed status
+            status = AnalysisStatus(
+                analysis_id=analysis_id,
+                status="completed",
+                progress=1.0,
+                current_stage="completed",
+                estimated_completion=None,
+                error_message=None,
+                agent_states={
+                    "Visual Design Analyst": "completed",
+                    "UX Experience Critic": "completed", 
+                    "Market Research Specialist": "completed"
+                }
+            )
+            return status
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail="Analysis not found"
+            )
     
     status = analysis_status[analysis_id]
     
@@ -294,21 +315,7 @@ async def get_analysis_status(analysis_id: str):
 async def get_analysis_result(analysis_id: str):
     """Get the result of a completed analysis."""
     
-    if analysis_id not in analysis_status:
-        raise HTTPException(
-            status_code=404,
-            detail="Analysis not found"
-        )
-    
-    status = analysis_status[analysis_id]
-    
-    if status.status != "completed":
-        raise HTTPException(
-            status_code=400,
-            detail=f"Analysis not completed. Current status: {status.status}"
-        )
-    
-    # Load result from file or cache
+    # Check if result file exists first (handles server restarts)
     result_file = settings.upload_dir / f"{analysis_id}_result.json"
     
     if not result_file.exists():
@@ -316,6 +323,19 @@ async def get_analysis_result(analysis_id: str):
             status_code=404,
             detail="Analysis result not found"
         )
+    
+    # Check in-memory status if available
+    if analysis_id in analysis_status:
+        status = analysis_status[analysis_id]
+        
+        if status.status != "completed":
+            raise HTTPException(
+                status_code=400,
+                detail=f"Analysis not completed. Current status: {status.status}"
+            )
+    
+    # If not in memory but file exists, assume it's completed
+    # This handles the case where server was restarted after analysis completion
     
     try:
         import json
